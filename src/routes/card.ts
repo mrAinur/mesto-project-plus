@@ -1,19 +1,19 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   addLike,
   createCard,
   deleteLike,
   getCards,
   removeCard
-} from "../controllers/card";
+} from '../controllers/card';
 
-const { celebrate, Joi } = require("celebrate");
+const { celebrate, Joi } = require('celebrate');
 
 const cardRouter = Router();
 
-cardRouter.get("", getCards);
+cardRouter.get('', getCards);
 cardRouter.post(
-  "",
+  '',
   celebrate({
     body: Joi.object()
       .keys({
@@ -24,8 +24,8 @@ cardRouter.post(
   }),
   createCard
 );
-cardRouter.delete("/:cardId", removeCard);
-cardRouter.put("/:cardId/likes", addLike);
-cardRouter.delete("/:cardId/likes", deleteLike);
+cardRouter.delete('/:cardId', removeCard);
+cardRouter.put('/:cardId/likes', addLike);
+cardRouter.delete('/:cardId/likes', deleteLike);
 
 export default cardRouter;

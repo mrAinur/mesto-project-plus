@@ -1,20 +1,20 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   createUser,
   editUserAvatar,
   editUserProfile,
   getUser,
   getUsers
-} from "../controllers/user";
+} from '../controllers/user';
 
-const { celebrate, Joi } = require("celebrate");
+const { celebrate, Joi } = require('celebrate');
 
 const usersRouter = Router();
 
-usersRouter.get("", getUsers);
-usersRouter.get("/:userId", getUser);
+usersRouter.get('', getUsers);
+usersRouter.get('/:userId', getUser);
 usersRouter.post(
-  "",
+  '',
   celebrate({
     body: Joi.object()
       .keys({
@@ -27,7 +27,7 @@ usersRouter.post(
   createUser
 );
 usersRouter.patch(
-  "/me",
+  '/me',
   celebrate({
     body: Joi.object()
       .keys({
@@ -39,13 +39,9 @@ usersRouter.patch(
   editUserProfile
 );
 usersRouter.patch(
-  "/me/avatar",
+  '/me/avatar',
   celebrate({
-    body: Joi.object()
-      .keys({
-        avatar: Joi.string()
-      })
-      .unknown(true)
+    body: Joi.object().keys({ avatar: Joi.string() }).unknown(true)
   }),
   editUserAvatar
 );

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 type Card = {
   name: string;
@@ -21,13 +21,13 @@ const cardSchema = new mongoose.Schema<Card>({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: 'user',
     required: true
   },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: 'user',
       required: true,
       default: []
     }
@@ -38,4 +38,4 @@ const cardSchema = new mongoose.Schema<Card>({
   }
 });
 
-export default mongoose.model<Card>("card", cardSchema);
+export default mongoose.model<Card>('card', cardSchema);

@@ -1,6 +1,3 @@
 {
-  "semi": true,
-  "singleQuote": false,
-  "trailingComma" : "none",
-  "plugins": ["prettier-plugin-braces-empty-line"]
+  "trailingComma": "none"
 }
