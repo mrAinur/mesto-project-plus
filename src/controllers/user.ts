@@ -1,30 +1,30 @@
-import User from "../models/user";
 import { NextFunction, Request, Response } from "express";
-
-const NotFoundError = require("../errors/not-found-err");
+import User from "../models/user";
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({}, { __v: 0 })
     .then((users) => {
-      if (!users)
-        throw new NotFoundError("Запрашиваемые пользователи не найдены");
       res.send(users);
     })
     .catch(next);
 };
 
-const getUser = (req: Request, res: Response, next: NextFunction) => {
+const getUser = (req: Request, res: Response) => {
   const { userId } = req.params;
   User.findById(userId, { __v: 0 })
     .then((user) => {
-      if (!user)
-        throw new NotFoundError("Запрашиваемый пользователь не найден");
       res.send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({
+          message: "Невалидный идентификатор карточки"
+        });
+      }
+    });
 };
 
-const createUser = (req: Request, res: Response, next: NextFunction) => {
+const createUser = (req: Request, res: Response) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) =>
@@ -32,38 +32,58 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
         name: user.name,
         about: user.about,
         avatar: user.avatar,
-        _id: user._id,
+        _id: user._id
       })
     )
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({
+          error: err.message
+        });
+      }
+    });
 };
 
-const editUserProfile = (req: Request, res: Response, next: NextFunction) => {
+const editUserProfile = (req: Request, res: Response) => {
   const { name, about, _id } = req.body;
-  User.findByIdAndUpdate(_id, { name, about }, { new: true })
+  User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((user) =>
       res.send({
         name: user!.name,
         about: user!.about,
         avatar: user!.avatar,
-        _id: user!._id,
+        _id: user!._id
       })
     )
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({
+          error: err.message
+        });
+      }
+    });
 };
 
-const editUserAvatar = (req: Request, res: Response, next: NextFunction) => {
+const editUserAvatar = (req: Request, res: Response) => {
   const { avatar, _id } = req.body;
-  User.findByIdAndUpdate(_id, { avatar }, { new: true })
+  User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
     .then((user) =>
       res.send({
         name: user!.name,
         about: user!.about,
         avatar: user!.avatar,
-        _id: user!._id,
+        _id: user!._id
       })
     )
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({
+          error: err.message
+        });
+      }
+    });
 };
 
-export { getUsers, getUser, createUser, editUserProfile, editUserAvatar };
+export {
+  getUsers, getUser, createUser, editUserProfile, editUserAvatar
+};

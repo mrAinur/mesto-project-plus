@@ -1,11 +1,11 @@
+import { Router } from "express";
 import {
   addLike,
   createCard,
   deleteLike,
   getCards,
-  removeCard,
+  removeCard
 } from "../controllers/card";
-import { Router } from "express";
 
 const { celebrate, Joi } = require("celebrate");
 
@@ -18,9 +18,9 @@ cardRouter.post(
     body: Joi.object()
       .keys({
         name: Joi.string().min(2).max(30),
-        link: Joi.string().min(10).max(200),
+        link: Joi.string()
       })
-      .unknown(true),
+      .unknown(true)
   }),
   createCard
 );

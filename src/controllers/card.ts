@@ -1,92 +1,112 @@
-import Card from "../models/card";
 import { NextFunction, Request, Response } from "express";
-
-const NotFoundError = require("../errors/not-found-err");
+import Card from "../models/card";
 
 const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({}, { __v: 0 })
     .then((cards) => {
-      if (!cards) throw new NotFoundError("Карточки не найдены");
       res.send(cards);
     })
     .catch(next);
 };
 
-const createCard = (req: Request, res: Response, next: NextFunction) => {
+const createCard = (req: Request, res: Response) => {
   const { name, link, _id } = req.body;
   Card.create({
     name,
     link,
-    owner: _id,
+    owner: _id
   })
-    .then((card) =>
+    .then((card) => {
       res.send({
         name: card.name,
         link: card.link,
         owner: card.owner,
         likes: card.likes,
         createdAd: card.createdAd,
-        _id: card._id,
-      })
-    )
-    .catch(next);
+        _id: card._id
+      });
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({
+          error: err.message
+        });
+      }
+    });
 };
 
-const removeCard = (req: Request, res: Response, next: NextFunction) => {
+const removeCard = (req: Request, res: Response) => {
   const { cardId } = req.params;
   Card.findByIdAndDelete(cardId)
     .then((card) => {
-      if (!card) throw new NotFoundError("Карточка не найдена");
       res.send({
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAd: card.createdAd,
-        _id: card._id,
+        name: card!.name,
+        link: card!.link,
+        owner: card!.owner,
+        likes: card!.likes,
+        createdAd: card!.createdAd,
+        _id: card!._id
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({
+          message: "Невалидный идентификатор карточки"
+        });
+      }
+    });
 };
 
-const addLike = (req: Request, res: Response, next: NextFunction) => {
+const addLike = (req: Request, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.body._id } },
     { new: true }
   )
     .then((card) => {
-      if (!card) throw new NotFoundError("Данная карточка не найдена");
       res.send({
         name: card!.name,
         link: card!.link,
         owner: card!.owner,
         likes: card!.likes,
         createdAd: card!.createdAd,
-        _id: card!._id,
+        _id: card!._id
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({
+          message: "Невалидный идентификатор карточки"
+        });
+      }
+    });
 };
 
-const deleteLike = (req: Request, res: Response, next: NextFunction) => {
+const deleteLike = (req: Request, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.body._id } },
     { new: true }
   )
     .then((card) => {
-      if (!card) throw new NotFoundError("Данная карточка не найдена");
       res.send({
         name: card!.name,
         link: card!.link,
         owner: card!.owner,
         likes: card!.likes,
         createdAd: card!.createdAd,
-        _id: card!._id,
+        _id: card!._id
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({
+          message: "Невалидный идентификатор карточки"
+        });
+      }
+    });
 };
 
-export { getCards, createCard, removeCard, addLike, deleteLike };
+export {
+  getCards, createCard, removeCard, addLike, deleteLike
+};

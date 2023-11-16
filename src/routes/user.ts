@@ -1,11 +1,11 @@
+import { Router } from "express";
 import {
   createUser,
   editUserAvatar,
   editUserProfile,
   getUser,
-  getUsers,
+  getUsers
 } from "../controllers/user";
-import { Router } from "express";
 
 const { celebrate, Joi } = require("celebrate");
 
@@ -20,9 +20,9 @@ usersRouter.post(
       .keys({
         name: Joi.string().min(2).max(30),
         about: Joi.string().min(2).max(200),
-        avatar: Joi.string().min(10).max(200),
+        avatar: Joi.string()
       })
-      .unknown(true),
+      .unknown(true)
   }),
   createUser
 );
@@ -32,9 +32,9 @@ usersRouter.patch(
     body: Joi.object()
       .keys({
         name: Joi.string().min(2).max(30),
-        about: Joi.string().min(2).max(200),
+        about: Joi.string().min(2).max(200)
       })
-      .unknown(true),
+      .unknown(true)
   }),
   editUserProfile
 );
@@ -43,9 +43,9 @@ usersRouter.patch(
   celebrate({
     body: Joi.object()
       .keys({
-        avatar: Joi.string().min(10),
+        avatar: Joi.string()
       })
-      .unknown(true),
+      .unknown(true)
   }),
   editUserAvatar
 );

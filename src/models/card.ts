@@ -13,27 +13,29 @@ const cardSchema = new mongoose.Schema<Card>({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    required: true
   },
   link: {
     type: String,
-    required: true,
+    required: true
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    ref: "user",
+    required: true
   },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
       required: true,
-      default: [],
-    },
+      default: []
+    }
   ],
   createdAd: {
     type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 });
 
 export default mongoose.model<Card>("card", cardSchema);
