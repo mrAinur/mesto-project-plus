@@ -31,7 +31,7 @@ app.use('*', (req: Request, res: Response) => {
 
 app.use(errors());
 
-app.use((err: any, req: Request, res: Response) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

@@ -19,6 +19,7 @@
     "import/extensions": [".js", ".ts"]
   },
   "rules": {
+    "no-unused-vars": ["error", { "args": "none" }],
     "function-paren-newline": ["error", "multiline-arguments"],
     "implicit-arrow-linebreak": ["error", "below"],
     "comma-dangle": ["error", "never"],

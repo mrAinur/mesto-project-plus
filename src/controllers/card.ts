@@ -34,7 +34,7 @@ const createCard = (req: Request, res: Response, next: NextFunction) => {
           error: err.message
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -59,7 +59,7 @@ const removeCard = (req: Request, res: Response, next: NextFunction) => {
           message: 'Невалидный идентификатор карточки'
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -87,7 +87,7 @@ const addLike = (req: Request, res: Response, next: NextFunction) => {
           message: 'Невалидный идентификатор карточки'
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -115,7 +115,7 @@ const deleteLike = (req: Request, res: Response, next: NextFunction) => {
           message: 'Невалидный идентификатор карточки'
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };

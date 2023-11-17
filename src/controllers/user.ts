@@ -24,7 +24,7 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
           message: 'Невалидный идентификатор карточки'
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -45,7 +45,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
           error: err.message
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -70,7 +70,7 @@ const editUserProfile = (req: Request, res: Response, next: NextFunction) => {
           error: err.message
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
@@ -91,7 +91,7 @@ const editUserAvatar = (req: Request, res: Response, next: NextFunction) => {
           error: err.message
         });
       } else {
-        next('Default error');
+        next(err);
       }
     });
 };
