@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
-
-const NotFoundError = require('../errors/not-found-err');
+import NotFoundError from '../errors/not-found-err';
+import ForbiddenError from '../errors/forbidden-err';
+import { BAD_REQUEST_STATUS } from '../utils/constancies';
 
 const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({}, { __v: 0 })
@@ -12,25 +13,18 @@ const getCards = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const createCard = (req: Request, res: Response, next: NextFunction) => {
-  const { name, link, _id } = req.body;
+  const { name, link, payloud } = req.body;
   Card.create({
     name,
     link,
-    owner: _id
+    owner: payloud._id
   })
     .then((card) => {
-      res.send({
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAd: card.createdAd,
-        _id: card._id
-      });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({
+        res.status(BAD_REQUEST_STATUS).send({
           error: err.message
         });
       } else {
@@ -39,51 +33,37 @@ const createCard = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-const removeCard = (req: Request, res: Response, next: NextFunction) => {
+const removeCard = async (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
+  await Card.findById(cardId)
+    .populate('owner')
     .then((card) => {
-      if (!card) throw new NotFoundError('Данная карточка не найдена');
-      res.send({
-        name: card.name,
-        link: card.link,
-        owner: card.owner,
-        likes: card.likes,
-        createdAd: card.createdAd,
-        _id: card._id
+      if (!card) throw new NotFoundError('Карточка не найдена');
+      if (card.owner._id.toString() !== req.body.payloud._id) {
+        throw new ForbiddenError('Вы не можете удалить чужую карточку');
+      }
+    })
+    .then(() => {
+      Card.findByIdAndDelete(cardId).then((cardDel) => {
+        res.send(cardDel);
       });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({
-          message: 'Невалидный идентификатор карточки'
-        });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const addLike = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.body._id } },
+    { $addToSet: { likes: req.body.payloud._id } },
     { new: true }
   )
     .then((card) => {
       if (!card) throw new NotFoundError('Данная карточка не найдена');
-      res.send({
-        name: card!.name,
-        link: card!.link,
-        owner: card!.owner,
-        likes: card!.likes,
-        createdAd: card!.createdAd,
-        _id: card!._id
-      });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({
+        res.status(BAD_REQUEST_STATUS).send({
           message: 'Невалидный идентификатор карточки'
         });
       } else {
@@ -95,23 +75,16 @@ const addLike = (req: Request, res: Response, next: NextFunction) => {
 const deleteLike = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.body._id } },
+    { $pull: { likes: req.body.payloud._id } },
     { new: true }
   )
     .then((card) => {
       if (!card) throw new NotFoundError('Данная карточка не найдена');
-      res.send({
-        name: card!.name,
-        link: card!.link,
-        owner: card!.owner,
-        likes: card!.likes,
-        createdAd: card!.createdAd,
-        _id: card!._id
-      });
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({
+        res.status(BAD_REQUEST_STATUS).send({
           message: 'Невалидный идентификатор карточки'
         });
       } else {

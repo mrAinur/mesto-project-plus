@@ -1,8 +1,8 @@
-class NotFoundError extends Error {
-  constructor(public message: string, public statusCode = 404) {
+import { NOT_FOUND_STATUS } from '../utils/constancies';
+
+export default class NotFoundError extends Error {
+  constructor(public message: string, public statusCode = NOT_FOUND_STATUS) {
     super(message);
     this.statusCode = statusCode;
   }
 }
-
-module.exports = NotFoundError;

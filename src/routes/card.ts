@@ -11,10 +11,23 @@ const { celebrate, Joi } = require('celebrate');
 
 const cardRouter = Router();
 
-cardRouter.get('', getCards);
+cardRouter.get(
+  '',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  getCards
+);
 cardRouter.post(
   '',
   celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required(),
     body: Joi.object()
       .keys({
         name: Joi.string().min(2).max(30),
@@ -24,8 +37,35 @@ cardRouter.post(
   }),
   createCard
 );
-cardRouter.delete('/:cardId', removeCard);
-cardRouter.put('/:cardId/likes', addLike);
-cardRouter.delete('/:cardId/likes', deleteLike);
+cardRouter.delete(
+  '/:cardId',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  removeCard
+);
+cardRouter.put(
+  '/:cardId/likes',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  addLike
+);
+cardRouter.delete(
+  '/:cardId/likes',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  deleteLike
+);
 
 export default cardRouter;

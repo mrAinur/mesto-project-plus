@@ -19,6 +19,8 @@
     "import/extensions": [".js", ".ts"]
   },
   "rules": {
+    "no-unused-expressions": ["error", { "allowTernary": true }],
+    "prefer-const": "error",
     "no-unused-vars": ["error", { "args": "none" }],
     "function-paren-newline": ["error", "multiline-arguments"],
     "implicit-arrow-linebreak": ["error", "below"],

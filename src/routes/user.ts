@@ -1,34 +1,51 @@
 import { Router } from 'express';
+import { celebrate, Joi } from 'celebrate';
 import {
-  createUser,
   editUserAvatar,
   editUserProfile,
-  getUser,
-  getUsers
+  getUsers,
+  getUserInfo
 } from '../controllers/user';
-
-const { celebrate, Joi } = require('celebrate');
 
 const usersRouter = Router();
 
-usersRouter.get('', getUsers);
-usersRouter.get('/:userId', getUser);
-usersRouter.post(
+usersRouter.get(
   '',
   celebrate({
-    body: Joi.object()
-      .keys({
-        name: Joi.string().min(2).max(30),
-        about: Joi.string().min(2).max(200),
-        avatar: Joi.string()
-      })
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
       .unknown(true)
+      .required()
   }),
-  createUser
+  getUsers
+);
+usersRouter.get(
+  '/me',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  getUserInfo
+);
+usersRouter.get(
+  '/:userId',
+  celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required()
+  }),
+  getUserInfo
 );
 usersRouter.patch(
   '/me',
   celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required(),
     body: Joi.object()
       .keys({
         name: Joi.string().min(2).max(30),
@@ -41,6 +58,10 @@ usersRouter.patch(
 usersRouter.patch(
   '/me/avatar',
   celebrate({
+    headers: Joi.object()
+      .keys({ Cookies: Joi.string() })
+      .unknown(true)
+      .required(),
     body: Joi.object().keys({ avatar: Joi.string() }).unknown(true)
   }),
   editUserAvatar
