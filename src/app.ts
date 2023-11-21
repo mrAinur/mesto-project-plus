@@ -8,6 +8,7 @@ import loginUser from './controllers/login';
 import { createUser } from './controllers/user';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
+import NotFoundError from './errors/not-found-err';
 
 require('dotenv').config();
 
@@ -56,8 +57,8 @@ app.use(auth);
 
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use('*', (req: Request, res: Response) => {
-  res.status(404).send({ error: 'Страниица не найдена' });
+app.use('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.use(errorLogger);

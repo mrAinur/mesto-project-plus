@@ -4,6 +4,7 @@ import User from '../models/user';
 import { BAD_REQUEST_STATUS } from '../utils/constancies';
 import NotFoundError from '../errors/not-found-err';
 import ConflictError from '../errors/conflict-err';
+import NotValidData from '../errors/not-valid-err';
 
 const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({}, { __v: 0 })
@@ -21,9 +22,7 @@ const getUser = (userId: string, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          message: 'Невалидный идентификатор пользователя'
-        });
+        next(new NotValidData('Невалидный идентификатор пользователя'));
       } else {
         next(err);
       }
@@ -38,9 +37,7 @@ const getAuthUserInfo = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          message: 'Невалидный идентификатор пользователя'
-        });
+        next(new NotValidData('Невалидный идентификатор пользователя'));
       } else {
         next(err);
       }
@@ -48,26 +45,26 @@ const getAuthUserInfo = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getUserInfo = (req: Request, res: Response, next: NextFunction) => {
-  req.params.userId
-    ? getUser(req.params.userId, res, next)
+  req.params.id
+    ? getUser(req.params.id, res, next)
     : getAuthUserInfo(req, res, next);
 };
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
   bcrypt.hash(req.body.password, 10).then((hash) => {
     User.create({ ...req.body, password: hash })
-      .then((user) =>
-        res.send(user))
+      .then((user) => res.send(user))
       .catch((err) => {
-        if (err.code === 11000) {
-          throw new ConflictError(
-            'Данная почта уже зарегистрирована, используйте другую'
+        if (err.code === 11000 || err.name === 'ValidationError') {
+          next(
+            new ConflictError(
+              'Данная почта уже зарегистрирована, используйте другую'
+            )
           );
         } else {
           next(err);
         }
-      })
-      .catch(next);
+      });
   });
 };
 
@@ -78,13 +75,10 @@ const editUserProfile = (req: Request, res: Response, next: NextFunction) => {
     { name, about },
     { new: true, runValidators: true }
   )
-    .then((user) =>
-      res.send(user))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          error: err.message
-        });
+        next(new NotValidData(err.message));
       } else {
         next(err);
       }
@@ -98,19 +92,14 @@ const editUserAvatar = (req: Request, res: Response, next: NextFunction) => {
     { avatar },
     { new: true, runValidators: true }
   )
-    .then((user) =>
-      res.send(user))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          error: err.message
-        });
+        next(new NotValidData(err.message));
       } else {
         next(err);
       }
     });
 };
 
-export {
-  getUsers, createUser, editUserProfile, editUserAvatar, getUserInfo
-};
+export { getUsers, createUser, editUserProfile, editUserAvatar, getUserInfo };

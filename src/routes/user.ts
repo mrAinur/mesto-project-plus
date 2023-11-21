@@ -30,8 +30,11 @@ usersRouter.get(
   getUserInfo
 );
 usersRouter.get(
-  '/:userId',
+  '/:id',
   celebrate({
+    params: Joi.object().keys({
+      id: Joi.string().required()
+    }),
     headers: Joi.object()
       .keys({ Cookies: Joi.string() })
       .unknown(true)

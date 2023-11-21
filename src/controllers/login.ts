@@ -7,8 +7,7 @@ import {
   tokenBearerStr,
   tokenSecretStr
 } from '../utils/constancies';
-
-const NotAuthError = require('../errors/not-auth-err');
+import NotAuthError from '../errors/not-auth-err';
 
 const loginUser = (req: Request, res: Response, next: NextFunction) => {
   User.findOne({ email: req.body.email })
@@ -32,13 +31,12 @@ const loginUser = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'TypeError') {
-        res.status(UNAUTHORIZED_STATUS).send({
-          message: 'Неправильные почта или пароль'
-        });
+        throw new NotAuthError('Неправильные почта или пароль');
       } else {
         next(err);
       }
-    });
+    })
+    .catch(next);
 };
 
 export default loginUser;

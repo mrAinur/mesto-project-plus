@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import isValidUrl from '../utils/checkAvatarUrl';
 
 type Card = {
   name: string;
@@ -17,7 +18,14 @@ const cardSchema = new mongoose.Schema<Card>({
   },
   link: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator(v: string) {
+        return isValidUrl(v);
+      },
+      message:
+        'Ссылка на желаемую фотографию, указана неверно, пожалуйста, проверьте формат ссылки'
+    }
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-err';
 import ForbiddenError from '../errors/forbidden-err';
-import { BAD_REQUEST_STATUS } from '../utils/constancies';
+import NotValidData from '../errors/not-valid-err';
 
 const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({}, { __v: 0 })
@@ -24,19 +24,17 @@ const createCard = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          error: err.message
-        });
+        next(new NotValidData(err.message));
       } else {
         next(err);
       }
     });
 };
 
-const removeCard = async (req: Request, res: Response, next: NextFunction) => {
+const removeCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  await Card.findById(cardId)
-    .populate('owner')
+  Card.findById(cardId)
+    .populate('owner', '_id')
     .then((card) => {
       if (!card) throw new NotFoundError('Карточка не найдена');
       if (card.owner._id.toString() !== req.body.payloud._id) {
@@ -48,7 +46,13 @@ const removeCard = async (req: Request, res: Response, next: NextFunction) => {
         res.send(cardDel);
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('Карточка не найдена'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const addLike = (req: Request, res: Response, next: NextFunction) => {
@@ -63,9 +67,7 @@ const addLike = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          message: 'Невалидный идентификатор карточки'
-        });
+        next(new NotValidData('Невалидный идентификатор карточки'));
       } else {
         next(err);
       }
@@ -84,15 +86,11 @@ const deleteLike = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST_STATUS).send({
-          message: 'Невалидный идентификатор карточки'
-        });
+        next(new NotValidData('Невалидный идентификатор карточки'));
       } else {
         next(err);
       }
     });
 };
 
-export {
-  getCards, createCard, removeCard, addLike, deleteLike
-};
+export { getCards, createCard, removeCard, addLike, deleteLike };
