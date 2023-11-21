@@ -33,7 +33,7 @@ usersRouter.get(
   '/:id',
   celebrate({
     params: Joi.object().keys({
-      id: Joi.string().required()
+      id: Joi.string().hex().required()
     }),
     headers: Joi.object()
       .keys({ Cookies: Joi.string() })

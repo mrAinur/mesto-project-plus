@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
-import { BAD_REQUEST_STATUS } from '../utils/constancies';
 import NotFoundError from '../errors/not-found-err';
 import ConflictError from '../errors/conflict-err';
 import NotValidData from '../errors/not-valid-err';
@@ -53,7 +52,8 @@ const getUserInfo = (req: Request, res: Response, next: NextFunction) => {
 const createUser = (req: Request, res: Response, next: NextFunction) => {
   bcrypt.hash(req.body.password, 10).then((hash) => {
     User.create({ ...req.body, password: hash })
-      .then((user) => res.send(user))
+      .then((user) =>
+        res.send(user))
       .catch((err) => {
         if (err.code === 11000 || err.name === 'ValidationError') {
           next(
@@ -75,7 +75,8 @@ const editUserProfile = (req: Request, res: Response, next: NextFunction) => {
     { name, about },
     { new: true, runValidators: true }
   )
-    .then((user) => res.send(user))
+    .then((user) =>
+      res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new NotValidData(err.message));
@@ -92,7 +93,8 @@ const editUserAvatar = (req: Request, res: Response, next: NextFunction) => {
     { avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => res.send(user))
+    .then((user) =>
+      res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new NotValidData(err.message));
@@ -102,4 +104,6 @@ const editUserAvatar = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export { getUsers, createUser, editUserProfile, editUserAvatar, getUserInfo };
+export {
+  getUsers, createUser, editUserProfile, editUserAvatar, getUserInfo
+};

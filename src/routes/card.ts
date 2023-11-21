@@ -41,7 +41,7 @@ cardRouter.delete(
   '/:cardId',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().required()
+      cardId: Joi.string().hex().required()
     }),
     headers: Joi.object()
       .keys({ Cookies: Joi.string() })
@@ -54,7 +54,7 @@ cardRouter.put(
   '/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().required()
+      cardId: Joi.string().hex().required()
     }),
     headers: Joi.object()
       .keys({ Cookies: Joi.string() })
@@ -67,7 +67,7 @@ cardRouter.delete(
   '/:cardId/likes',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().required()
+      cardId: Joi.string().hex().required()
     }),
     headers: Joi.object()
       .keys({ Cookies: Joi.string() })

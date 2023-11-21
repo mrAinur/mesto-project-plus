@@ -2,11 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
-import {
-  UNAUTHORIZED_STATUS,
-  tokenBearerStr,
-  tokenSecretStr
-} from '../utils/constancies';
+import { tokenBearerStr, tokenSecretStr } from '../utils/constancies';
 import NotAuthError from '../errors/not-auth-err';
 
 const loginUser = (req: Request, res: Response, next: NextFunction) => {

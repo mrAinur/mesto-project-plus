@@ -34,10 +34,9 @@ const createCard = (req: Request, res: Response, next: NextFunction) => {
 const removeCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
   Card.findById(cardId)
-    .populate('owner', '_id')
     .then((card) => {
       if (!card) throw new NotFoundError('Карточка не найдена');
-      if (card.owner._id.toString() !== req.body.payloud._id) {
+      if (card.owner.toString() !== req.body.payloud._id) {
         throw new ForbiddenError('Вы не можете удалить чужую карточку');
       }
     })
@@ -93,4 +92,6 @@ const deleteLike = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export { getCards, createCard, removeCard, addLike, deleteLike };
+export {
+  getCards, createCard, removeCard, addLike, deleteLike
+};
